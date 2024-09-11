@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: vulnerabilities
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost
+      - POSTGRES_DB=vulnerabilities
+      - POSTGRES_USER=django
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
